@@ -34,27 +34,17 @@ function formatToUSD() {
   }).format;
 }
 
-function printStatementTXT(items) {
-  let result = '';
-  items["data"].map(function (e, index) {
-    result += ` ${e.playName}: ${e.amount} (${e.audience} seats)\n`
-  })
-  return result;
-}
-
-function statement (invoice, plays) {
+function createStatementData(invoice, plays) {
   let items = {};
   items["customer"] = invoice.customer;
   items["data"] = [];
   let totalAmount = 0;
   let volumeCredits = 0;
-  let result = `Statement for ${items["customer"]}\n`;
   const format = formatToUSD();
   for (let perf of invoice.performances) {
     const play = plays[perf.playID];
     let thisAmount = calThisAmount(perf, play);
     volumeCredits = calVolumeCredits(volumeCredits, perf, play);
-    //print line for this order
     items["data"].push(
         {
           playName: play.name,
@@ -64,12 +54,25 @@ function statement (invoice, plays) {
     );
     totalAmount += thisAmount;
   }
-  result += printStatementTXT(items);
   items["totalAmount"] = format(totalAmount / 100);
   items["volumeCredits"] = volumeCredits;
+  return items;
+}
+
+function printStatementTXT(items) {
+  let result = '';
+  result += `Statement for ${items["customer"]}\n`;
+  items["data"].map(function (e, index) {
+    result += ` ${e.playName}: ${e.amount} (${e.audience} seats)\n`
+  })
   result += `Amount owed is ${items["totalAmount"]}\n`;
   result += `You earned ${items["volumeCredits"]} credits \n`;
   return result;
+}
+
+function statement (invoice, plays) {
+  let statementData = createStatementData(invoice, plays);
+  return printStatementTXT(statementData);
 }
 
 
