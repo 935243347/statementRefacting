@@ -34,6 +34,14 @@ function formatToUSD() {
   }).format;
 }
 
+function printStatementTXT(items) {
+  let result = '';
+  items["data"].map(function (e, index) {
+    result += ` ${e.playName}: ${e.amount} (${e.audience} seats)\n`
+  })
+  return result;
+}
+
 function statement (invoice, plays) {
   let items = {};
   items["customer"] = invoice.customer;
@@ -54,9 +62,9 @@ function statement (invoice, plays) {
           audience: perf.audience
         }
     );
-    result += ` ${play.name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
     totalAmount += thisAmount;
   }
+  result += printStatementTXT(items);
   items["totalAmount"] = format(totalAmount / 100);
   items["volumeCredits"] = volumeCredits;
   result += `Amount owed is ${items["totalAmount"]}\n`;
@@ -79,30 +87,3 @@ module.exports = {
 //     '</table>\n' +
 //     '<p>Amount owed is <em>$1,730.00</em></p>\n' +
 //     '<p>You earned <em>47</em> credits</p>\n');
-
-function createStatementDate(invoice, plays){
-  let items = {};
-  items["customer"] = invoice.customer;
-  items["data"] = [];
-  console.log(items)
-  let totalAmount = 0;
-  let volumeCredits = 0;
-  const format = formatToUSD();
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
-    let thisAmount = calThisAmount(perf, play);
-    volumeCredits = calVolumeCredits(volumeCredits, perf, play);
-    items["data"].push(
-        {
-          playName: play.name,
-          amount: format(thisAmount / 100),
-          audience: perf.audience
-        }
-    );
-    totalAmount += thisAmount;
-  }
-  items["totalAmount"] = totalAmount;
-  items["volumeCredits"] = volumeCredits;
-  console.log(items)
-  return items
-}
