@@ -70,23 +70,28 @@ function printStatementTXT(items) {
   return result;
 }
 
+function printStatementHTML(items) {
+  let result = '';
+  result += `<h1>Statement for ${items["customer"]}</h1>\n<table>\n`;
+  result += `<tr><th>play</th><th>seats</th><th>cost</th></tr>`;
+  items["data"].map(function (e, index) {
+    result += ` <tr><td>${e.playName}</td><td>${e.audience}</td><td>${e.amount}</td></tr>\n`
+  })
+  result += `</table>\n<p>Amount owed is <em>${items["totalAmount"]}</em></p>\n`;
+  result += `<p>You earned <em>${items["volumeCredits"]}</em> credits</p>\n`;
+  return result;
+}
+
 function statement (invoice, plays) {
   let statementData = createStatementData(invoice, plays);
   return printStatementTXT(statementData);
 }
 
+function statementHTML (invoice, plays) {
+  let statementData = createStatementData(invoice, plays);
+  return printStatementHTML(statementData);
+}
 
 module.exports = {
-  statement,
+  statement, statementHTML,
 };
-
-//
-// t.is(result, '<h1>Statement for BigCo</h1>\n' +
-//     '<table>\n' +
-//     '<tr><th>play</th><th>seats</th><th>cost</th></tr>' +
-//     ' <tr><td>Hamlet</td><td>55</td><td>$650.00</td></tr>\n' +
-//     ' <tr><td>As You Like It</td><td>35</td><td>$580.00</td></tr>\n' +
-//     ' <tr><td>Othello</td><td>40</td><td>$500.00</td></tr>\n' +
-//     '</table>\n' +
-//     '<p>Amount owed is <em>$1,730.00</em></p>\n' +
-//     '<p>You earned <em>47</em> credits</p>\n');
